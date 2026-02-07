@@ -23,7 +23,7 @@ const defaultAllowed = [
   'https://medicostsaver.com',
   'https://www.medicostsaver.com',
   'https://medicostsaver-frontend.vercel.app',
-  'https://medicost-saver-frontend.vercel.app'
+  'https://medi-frontend-delta.vercel.app'
 ];
 
 const envAllowed = process.env.ALLOWED_ORIGINS

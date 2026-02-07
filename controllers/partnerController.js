@@ -504,7 +504,7 @@ exports.getAllPartners = async (req, res) => {
     const search = req.query.search || '';
     const source = req.query.source || '';
 
-    let filter = { status: 'Active' };
+    let filter = {};
     if (source === 'admin' || source === 'self') {
       filter.source = source;
     }
