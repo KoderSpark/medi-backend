@@ -53,12 +53,40 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",     // <-- missing
-    allowedHeaders: ["Content-Type", "Authorization"],      // <-- missing
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin"
+    ],
+    exposedHeaders: ["Content-Range", "X-Content-Range"],
     preflightContinue: false,
     optionsSuccessStatus: 204
   })
 );
+
+// Explicitly handle preflight OPTIONS for ALL routes
+// This is critical for multipart/form-data uploads (e.g. /api/doctors/upload)
+// Vercel serverless can drop CORS headers if OPTIONS isn't handled before route middleware
+app.options('*', cors({
+  origin(origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+    "Origin"
+  ],
+  optionsSuccessStatus: 204
+}));
 
 // ---------- OTHER MIDDLEWARE ----------
 app.use(express.json({ limit: '50mb' }));
