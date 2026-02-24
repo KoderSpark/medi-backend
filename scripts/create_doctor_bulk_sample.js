@@ -2,33 +2,43 @@
 const xlsx = require('xlsx');
 const path = require('path');
 
+// Sample data using the EXACT column headers accepted by POST /api/doctors/upload
 const data = [
     {
-        "Name": "Dr. Rajesh Kumar",
-        "E-mail": "rajesh.kumar@example.com",
-        "Category/ Specialization": "Cardsiology",
-        "Designation": "Senior Consultant",
+        "Doctor Name": "Dr. Rajesh Kumar",          // REQUIRED
         "City": "Mumbai",
+        "State": "Maharashtra",
         "Address": "123, Health Street, Bandra",
-        "Phone": "9876543210"
+        "E-mail": "rajesh.kumar@example.com",
+        "Phone Number": "9876543210",
+        "Category": "Cardiologist",
+        "Designation": "Senior Consultant",
+        "pincode": "400050",
+        "website": "www.rajeshkumar.com"
     },
     {
-        "Name": "Dr. Anjali Gupta",
-        "E-mail": "anjali.gupta@example.com",
-        "Category/ Specialization": "Dermatology",
-        "Designation": "Consultant",
+        "Doctor Name": "Dr. Anjali Gupta",
         "City": "Delhi",
+        "State": "Delhi",
         "Address": "456, Care Lane, Dwarka",
-        "Phone": "8765432109"
+        "E-mail": "anjali.gupta@example.com",
+        "Phone Number": "8765432109",
+        "Category": "Dermatologist",
+        "Designation": "Consultant",
+        "pincode": "110075",
+        "website": ""
     },
     {
-        "Name": "Dr. Vivek Singh",
-        "E-mail": "vivek.singh@example.com",
-        "Category/ Specialization": "Orthopedics",
-        "Designation": "Head of Department",
+        "Doctor Name": "Dr. Vivek Singh",
         "City": "Bangalore",
+        "State": "Karnataka",
         "Address": "789, Bone Avenue, Indiranagar",
-        "Phone": "7654321098"
+        "E-mail": "vivek.singh@example.com",
+        "Phone Number": "7654321098",
+        "Category": "Orthopedics",
+        "Designation": "Head of Department",
+        "pincode": "560038",
+        "website": "www.viveksingh.in"
     }
 ];
 
@@ -40,3 +50,4 @@ const outputPath = path.join(__dirname, 'sample_doctors.xlsx');
 xlsx.writeFile(wb, outputPath);
 
 console.log(`Sample Excel file created at: ${outputPath}`);
+console.log('Column headers:', Object.keys(data[0]).join(', '));

@@ -137,14 +137,21 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         }
 
         // STRICT Column Mapping & Validation
+        // Required Excel columns for bulk doctor upload:
         const ALLOWED_COLUMNS = [
-            "Category", "Source", "Doctor's Name", "Clinic/Institute Name",
-            "Address-1", "Address-2", "Address-3", "Distt.", "City", "State",
-            "Pin Code", "Phone No.", "Resi. No.", "Fax No.", "E-Mail ID's",
-            "Web Site", "Course", "D.O.B.", "Institute", "Specilisation"
+            "Doctor Name",    // → name (REQUIRED)
+            "City",           // → city
+            "State",          // → state
+            "Address",        // → address1
+            "E-mail",         // → email
+            "Phone Number",   // → phone
+            "Category",       // → category
+            "Designation",    // → designation
+            "pincode",        // → pincode
+            "website"         // → website
         ];
 
-        // Check headers
+        // Check headers — reject any column not in ALLOWED_COLUMNS
         const fileHeaders = Object.keys(rawData[0]);
 
         for (const header of fileHeaders) {
@@ -152,7 +159,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
             if (!match) {
                 return res.status(400).json({
                     success: false,
-                    message: `Upload rejected. Invalid column found: "${header}". Please use only the allowed columns.`
+                    message: `Upload rejected. Invalid column: "${header}". Allowed columns: ${ALLOWED_COLUMNS.join(', ')}`
                 });
             }
         }
@@ -164,33 +171,24 @@ router.post('/upload', upload.single('file'), async (req, res) => {
             };
 
             return {
-                category: getValue("Category"),
-                source: "admin_upload",
-                name: getValue("Doctor's Name"),
-                clinicName: getValue("Clinic/Institute Name"),
-                address1: getValue("Address-1"),
-                address2: getValue("Address-2"),
-                address3: getValue("Address-3"),
-                district: getValue("Distt."),
+                name: getValue("Doctor Name"),
                 city: getValue("City"),
                 state: getValue("State"),
-                pincode: getValue("Pin Code"),
-                phone: getValue("Phone No."),
-                resPhone: getValue("Resi. No."),
-                fax: getValue("Fax No."),
-                email: getValue("E-Mail ID's"),
-                website: getValue("Web Site"),
-                course: getValue("Course"),
-                dob: getValue("D.O.B."),
-                institute: getValue("Institute"),
-                specialization: getValue("Specilisation")
+                address1: getValue("Address"),
+                email: getValue("E-mail"),
+                phone: getValue("Phone Number"),
+                category: getValue("Category"),
+                designation: getValue("Designation"),
+                pincode: getValue("pincode"),
+                website: getValue("website"),
+                source: "admin_upload",
             };
         });
 
         const validDoctors = doctorsToInsert.filter(d => d.name);
 
         if (validDoctors.length === 0) {
-            return res.status(400).json({ success: false, message: "No valid doctor records found (Name is required)." });
+            return res.status(400).json({ success: false, message: "No valid doctor records found. 'Doctor Name' column is required." });
         }
 
         await Doctor.insertMany(validDoctors);
