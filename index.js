@@ -11,6 +11,8 @@ const doctorRoutes = require('./routes/doctors');
 const paymentRoutes = require('./routes/payments');
 const contactRoutes = require('./routes/contact');
 const activityRoutes = require('./routes/activity');
+const claimsRoutes = require('./routes/claims');
+const jobsRoutes = require('./routes/jobs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -117,6 +119,8 @@ app.use('/api/doctors', doctorRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/activity', activityRoutes);
+app.use('/api/claims', claimsRoutes);
+app.use('/api/jobs', jobsRoutes);
 
 app.get('/', (req, res) =>
   res.send({

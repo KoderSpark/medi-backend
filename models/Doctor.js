@@ -23,6 +23,8 @@ const doctorSchema = new mongoose.Schema(
         course: { type: String, trim: true },
         institute: { type: String, trim: true },
         specialization: { type: String, trim: true, index: true },
+        isClaimed: { type: Boolean, default: false },
+        claimedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner' },
         createdAt: { type: Date, default: Date.now },
     },
     { timestamps: true }

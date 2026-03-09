@@ -17,14 +17,14 @@ exports.register = async (req, res) => {
     const existing = await User.findOne({ email });
     if (existing) return res.status(409).json({ message: 'Email already in use' });
 
-  const members = Math.max(0, Number(familyMembers) || (Array.isArray(familyDetails) ? familyDetails.length : 0));
-  // Ensure phone has +91 prefix
-  const phoneWithPrefix = phone.startsWith('+91') ? phone : `+91${phone}`;
-  const user = new User({ name, email, phone: phoneWithPrefix, password, plan, familyMembers: members, familyDetails: Array.isArray(familyDetails) ? familyDetails : [] });
+    const members = Math.max(0, Number(familyMembers) || (Array.isArray(familyDetails) ? familyDetails.length : 0));
+    // Ensure phone has +91 prefix
+    const phoneWithPrefix = phone.startsWith('+91') ? phone : `+91${phone}`;
+    const user = new User({ name, email, phone: phoneWithPrefix, password, plan, familyMembers: members, familyDetails: Array.isArray(familyDetails) ? familyDetails : [] });
 
-  // Set validity: annual plan -> 1 year from now
-  const now = new Date();
-  user.validUntil = new Date(now.setFullYear(now.getFullYear() + 1));
+    // Set validity: annual plan -> 1 year from now
+    const now = new Date();
+    user.validUntil = new Date(now.setFullYear(now.getFullYear() + 1));
 
     await user.save();
 
@@ -40,7 +40,7 @@ exports.register = async (req, res) => {
 // Create a Razorpay order for registration payment and return order details
 exports.registerWithOrder = async (req, res) => {
   try {
-  const { name, email, phone, password, plan, familyMembers, familyDetails } = req.body;
+    const { name, email, phone, password, plan, familyMembers, familyDetails } = req.body;
     // basic validation
     if (!name || !email || !phone || !password || !plan) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -48,10 +48,10 @@ exports.registerWithOrder = async (req, res) => {
 
     // Decide amount based on plan (match frontend prices)
     // Single annual price is ₹365 per person per year. familyMembers is number of additional members.
-  const basePrice = 365;
-  const members = Math.max(0, Number(familyMembers) || (Array.isArray(familyDetails) ? familyDetails.length : 0));
-  // total persons = 1 primary + additional family members
-  const totalPersons = 1 + members;
+    const basePrice = 365;
+    const members = Math.max(0, Number(familyMembers) || (Array.isArray(familyDetails) ? familyDetails.length : 0));
+    // total persons = 1 primary + additional family members
+    const totalPersons = 1 + members;
     let amount = basePrice * totalPersons;
     // Apply 10% discount on total if any family members added
     if (members > 0) {
@@ -64,8 +64,8 @@ exports.registerWithOrder = async (req, res) => {
     const order = await instance.orders.create({ amount: Math.round(amount * 100), currency: 'INR', receipt: `reg_${Date.now()}` });
 
     // Send back order info and the received form data for frontend to complete payment
-  const phoneWithPrefix = phone.startsWith('+91') ? phone : `+91${phone}`;
-  res.json({ order, tempUser: { name, email, phone: phoneWithPrefix, password, plan, familyMembers: members, familyDetails: Array.isArray(familyDetails) ? familyDetails : [] } });
+    const phoneWithPrefix = phone.startsWith('+91') ? phone : `+91${phone}`;
+    res.json({ order, tempUser: { name, email, phone: phoneWithPrefix, password, plan, familyMembers: members, familyDetails: Array.isArray(familyDetails) ? familyDetails : [] } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to create registration order' });
@@ -128,11 +128,15 @@ exports.registerAdmin = async (req, res) => {
 exports.loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
     const Admin = require('../models/Admin');
-    const admin = await Admin.findOne({ email });
-    if (!admin) return res.status(401).json({ message: 'Invalid credentials' });
+    // Lowercase email to match how Mongoose stores it (schema has lowercase:true)
+    const admin = await Admin.findOne({ email: email.toLowerCase().trim() });
+    if (!admin) return res.status(401).json({ message: 'Admin not found with this email' });
     const match = await admin.comparePassword(password);
-    if (!match) return res.status(401).json({ message: 'Invalid credentials' });
+    if (!match) return res.status(401).json({ message: 'Incorrect password' });
 
     const token = createToken({ _id: admin._id, email: admin.email, isAdmin: true }, process.env.JWT_SECRET);
     res.json({ token, admin: { id: admin._id, email: admin.email, name: admin.name } });
