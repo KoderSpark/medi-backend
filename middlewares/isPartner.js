@@ -10,12 +10,18 @@ module.exports = async function (req, res, next) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (decoded.type !== 'partner') {
-      return res.status(403).json({ message: 'Access denied' });
+      console.log('isPartner error: decoded.type is not partner', decoded);
+      return res.status(403).json({ message: 'Access denied: not a partner token' });
     }
 
     // Check if partner exists and is active
     const partner = await Partner.findById(decoded.id);
-    if (!partner || partner.status !== 'Active') {
+    if (!partner) {
+      console.log('isPartner error: partner not found for id', decoded.id);
+      return res.status(403).json({ message: 'Account not found' });
+    }
+    if (partner.status !== 'Active') {
+      console.log('isPartner error: partner status is', partner.status);
       return res.status(403).json({ message: 'Account not approved or inactive' });
     }
 
