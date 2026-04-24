@@ -264,7 +264,6 @@ exports.register = async (req, res) => {
         name: responsibleName,
         designation,
         age: responsibleAge ? Number(responsibleAge) : undefined,
-        age: responsibleAge ? Number(responsibleAge) : undefined,
         sex: responsibleSex,
         dob: responsibleDOB,
       },
@@ -283,8 +282,6 @@ exports.register = async (req, res) => {
       discountItems: discountItems ? JSON.parse(discountItems) : [],
       source: 'self',
     });
-
-    await partner.save();
 
     // handle files: req.files contains buffers from multer memoryStorage
     const files = req.files || {};

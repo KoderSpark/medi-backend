@@ -162,3 +162,8 @@ Desktop.ini
 # Temporary files
 *.tmp
 *.temp
+
+# Large audit / data export files (never commit these to GitHub)
+duplicate_removal_audit_*.json
+*_audit_*.json
+output.txt
